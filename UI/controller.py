@@ -46,5 +46,45 @@ class Controller:
 
 
     def handleCerca(self, e):
-        pass
+        self._view.txt_result.controls.clear()
+        k = self._view._txtInK.value # prendo il valore dal campo di testo
+
+        # Validazione con return
+        if k is None or k == "":
+            self._view.txt_result.controls.append(ft.Text("Attenzione! Inserire un valore intero!", color="red"))
+            self._view.update_page()
+            return
+
+        try:
+            kInt = int(k)
+        except ValueError:
+            self._view.txt_result.controls.append(ft.Text("Attenzione! Inserire un valore intero!", color="red"))
+            self._view.update_page()
+            return
+
+        listaSquadreOttima, minDistEta = self._model.getListaSquadreOttima(kInt)
+
+        if listaSquadreOttima is None or len(listaSquadreOttima) == 0:
+            self._view.txt_result.controls.append(ft.Text(
+                f"Attenzione: Non ci sono abbastanza piloti con date valide per formare {kInt} squadre "
+                f"che NON siano state compagne di squadra nel range selezionato.", color="red"))
+            self._view.update_page()
+            return
+
+        # Stampa in caso di successo
+        self._view.txt_result.controls.append(ft.Text("Lista dei K costruttori selezionati:", color="green"))
+
+        # Ciclo pulito senza return interno
+        for s in listaSquadreOttima:
+            self._view.txt_result.controls.append(ft.Text(str(s)))
+
+        # Trovo min e max (usando la funzione lambda sulla data di nascita)
+        youngest = max(listaSquadreOttima, key=lambda x: x.oldest_driver_dob)
+        oldest = min(listaSquadreOttima, key=lambda x: x.oldest_driver_dob)
+        self._view.txt_result.controls.append(
+            ft.Text(f"Differenza di età tra i piloti: {minDistEta}"))
+        self._view.txt_result.controls.append(ft.Text(f"Squadra con il pilota più giovane: {youngest}"))
+        self._view.txt_result.controls.append(ft.Text(f"Squadra con il pilota più anziano: {oldest}"))
+        self._view.update_page()
+
 

@@ -72,3 +72,26 @@ class DAO():
         conn.close()
         return results
 
+    @staticmethod
+    def getDoB(squadra, year1, year2):
+        """Metodo per recuperare il pilota più anziano per ciascuna squadra"""
+        conn = DBConnect.get_connection()
+        results = []
+
+        cursor = conn.cursor(dictionary=True)
+        query = """SELECT MIN(d.dob) as oldest_dob
+                    FROM drivers d, results r, races ra
+                    WHERE d.driverId = r.driverId 
+                    AND r.raceId = ra.raceId
+                    AND r.constructorId = %s
+                    AND ra.year BETWEEN %s AND %s
+                                    """
+
+        cursor.execute(query, (squadra.constructorId, year1, year2))
+
+        for row in cursor:
+            squadra.oldest_driver_dob = row["oldest_dob"]
+        cursor.close()
+        conn.close()
+        return results
+

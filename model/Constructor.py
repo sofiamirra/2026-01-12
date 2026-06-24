@@ -7,6 +7,7 @@ class Constructor:
     constructorRef: str
     name: str
     nationality: str
+    # data di nascita del pilota più anziano che abbia corso
     oldest_driver_dob: datetime.date = None
 
     def __hash__(self):
