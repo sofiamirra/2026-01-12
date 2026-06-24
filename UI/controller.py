@@ -8,12 +8,42 @@ class Controller:
         # the model, which implements the logic of the program and holds the data
         self._model = model
 
+    def _fillDDYears(self):
+        years = self._model.getYears()
+        yearsDD = []
+        for year in years:
+            yearsDD.append(ft.dropdown.Option(year))
+        self._view._ddAnno1.options = yearsDD
+        self._view._ddAnno2.options = yearsDD
+        self._view.update_page()
 
     def handleCreaGrafo(self,e):
-        pass
+        year1 = self._view._ddAnno1.value
+        year2 = self._view._ddAnno2.value
+        self._model.buildGraph(year1, year2)
+        self._view.txt_result.controls.clear()
+        self._view.txt_result.controls.append(ft.Text("Grafo correttamente creato!", color="red"))
+
+        nNodes, nEdges = self._model.getGraphDetails()
+        self._view.txt_result.controls.append(ft.Text(f"Numero di nodi: {nNodes}"))
+        self._view.txt_result.controls.append(ft.Text(f"Numero di archi: {nEdges}"))
+        self._view.update_page()
 
     def handleDettagli(self, e):
-        pass
+        self._view.txt_result.controls.clear()  # pulisco prima di stampare qualsiasi cosa
+        self._view.txt_result.controls.append(ft.Text("Archi di peso maggiore: ", color="red"))
+        top_archi = self._model.getTop3Archi()
+        for arco in top_archi:
+            # Metodo di stampa definito in __str__ di arco
+            self._view.txt_result.controls.append(ft.Text(str(arco)))
+
+        nComp,  bComp, nodes = self._model.getComponentiConnesseDetails()
+        self._view.txt_result.controls.append(ft.Text(f"Il grafo ha {nComp} componenti connesse", color="red"))
+        self._view.txt_result.controls.append(ft.Text(f"Componente più grande ({len(nodes)} nodi): ", color="red"))
+        for node in nodes:
+            self._view.txt_result.controls.append(ft.Text(f"{node.constructorRef} ({node.name})"))
+        self._view.update_page()
+
 
     def handleCerca(self, e):
         pass
